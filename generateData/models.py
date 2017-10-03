@@ -45,3 +45,10 @@ class Prenoms(models.Model):
     #définition des champs visibles au niveau de la page d'administration
     def __str__(self):
     	return self.libelle
+
+class Emails(models.Model):
+    libelle    = models.CharField(max_length=25)
+    
+    #définition des champs visibles au niveau de la page d'administration
+    def __str__(self):
+        return self.libelle
