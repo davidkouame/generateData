@@ -6,73 +6,70 @@ from random import randrange, choice
 
 class generateForm(forms.Form):
 
-	#déclaration des attributs statique
-	__request = ""
-
-	#cet attribut contient le nombre de ligne à génerer
-	__row = 10
-
-	#tableau contenant les tables
-	__donnes = []
+	#déclaration des varaiables locales de la classe generateForm
+	__request       = "" #déclaration des attributs statique
+	__row           = 10 #nombre de ligne à générer (par défaut ce nombre prend la valeur 10)
+	__donnes        = [] #tableau contenant les tables
+	__database_name = "" #nom de la base de données
+	__table_name    = "" #nom de la table
+	__data          = "" #la données
 
 	def getData(self):
 
-		#récuperation du nombre de ligne à générer
-		self.__row = int(self.__request.POST["nombre_de_ligne"])
+		self.__row        = int(self.__request.POST["nombre_de_ligne"]) #récuperation du nombre de ligne à générer
+		self.__table_name = self.__request.POST["table_name"]           #récuperation du nom de la table
 
 		__file_name = self.__request.POST["file_name"]
-		__database_name = "database"
 
-		__data = ""
-
-		if len(__file_name) > 0:
-			__database_name = __file_name
+		#récuperation du nom de la base de données
+		if len(self.__request.POST["database_name"]) > 0:
+			self.__database_name = self.__request.POST["database_name"]
 
 		#on vérifie le statut de drop database
 		if self.__request.POST["is_drop_database"] == "true":
 			#destruction de la base de données s'il elle existe
-			__data = __data + "DROP SCHEMA IF EXISTS `"+__database_name+"`;"
+			self._data =self. __data + "DROP SCHEMA IF EXISTS `"+self.__database_name+"`;"
 
 		#création de la base de données
-		__data=__data+"CREATE SCHEMA `"+__database_name+"` ;"
+		self.__data= self.__data + "CREATE SCHEMA `"+self.__database_name+"` ;"
 
-		####################CREATION DE LA TABLE####################
-		self.__donnes = self.__request.POST.get('donnees')
+		#on vérifie le statut de drop table
+		if self.__request.POST["is_drop_table"] == "true":
+			#destruction de la table s'il elle existe
+			__data = __data + "DROP Table IF EXISTS `"+self.__table_name+"`;"
 
+		#===========================Début de la création de la table===========================#
+		self.__data = self.__data +"CREATE TABLE `"+self.__database_name+"`.`"+self.__table_name+"`("
+
+		self.__donnes = self.__request.POST.get('donnees') #récupération des données
 		if self.__donnes:
 			self.__donnees = json.loads(self.__donnes)
 
-		__data = __data +"CREATE TABLE `"+__database_name+"`.`"+__database_name+"`("
-
-		__content = "`id` INT NOT NULL,"
+		content_table = "`id` INT NOT NULL,"
 		for table in self.__donnees:
-			__content = __content + "`"+table["title"]+"` "+self.getField(table)+","
+			content_table = content_table + "`"+table["title"]+"` "+self.getField(table)+","
 
-		__data = __data + __content
+		self.__data = self.__data + content_table
+		self.__data = self.__data +"PRIMARY KEY (`id`));" #ajout du primary key
+		#===========================Fin de la création de la table===========================#
 
-		#ajout du primary key
-		__data = __data +"PRIMARY KEY (`id`));"
-
-		####################FIN DE LA CREATION DE LA TABLE#############
-
-
-		__content = ""
+		########################Insertion des données dans la table#####################
+		content_table = ""
 		i = 0
-		###############INSERTION DES DONNEES DANS LA TABLE#############
 		e = 1
 		while e < self.__row :
 			e+=1
 			for table in self.__donnees:
 				i+=1
-				__content = __content + "INSERT INTO `"+__database_name+"`.`"+__database_name+"` (`id`,`nom`) VALUES("+str(i)+",'"+self.getValue(table)+"');"
-		###############FIN INSERTION DES DONNEES DANS LA TABLE#########
+				content_table = content_table + "INSERT INTO `"+self.__database_name+"`.`"+self.__table_name+"` (`id`,`nom`) VALUES("+str(i)+",'"+self.getValue(table)+"');"
+		########################Fin de l'insertion des données###########################
 
 
-		__data = __data + __content
-		return __data
+		self.__data = self.__data + content_table
+		return self.__data
 
 	def getTelephone(self):
-		#recuperation d'un nombre en 0 et 9
+		#recuperation d'un nombre entre 0 et 9
 		i = randrange(0,9)
 		number =""
 		number+=str(i*1)
@@ -338,14 +335,3 @@ class generateForm(forms.Form):
 	def __init__(self, request):
 		self.ne = self
 		self.__request = request
-
-		#recuperate all the elements post
-		#self.file_name = request.POST["file_name"]
-
-		#print(request.POST["is_drop___database"])
-
-
-
-
-		#cleaned___data = super (generateForm, self).clean()
-		#file_name = cleaned___data.get("file___data")

@@ -76,9 +76,6 @@ $(function () {
 	//permet de generer les données
 	$("#form-generate").submit(function(e){
 
-
-
-
 		//ajout du loader du btn
         $("#generate").addClass("buttonload").empty().append('<i class="fa fa-spinner fa-spin"></i>Loading');
 
@@ -107,8 +104,11 @@ $(function () {
 						"csrfmiddlewaretoken" : token_right,
 						"file_name"           : $("input[name='file_name']").val(),
 						"is_drop_database"    : $("input[name='is_drop_database']").is(":checked"),
+            "is_drop_table"       : $("input[name='is_drop_table']").is(":checked"),
 						"title"               : $("input[name='title']").val(),
             "nombre_de_ligne"     : $("input[name='nombre_de_ligne']").val(),//nombre de ligne à générer
+            "table_name"          : $("input[name='table_name']").val(),//nom de la table
+            "database_name"       : $("input[name='database_name']").val(),//nom de la base de données
 						"donnees"             : JSON.stringify(donnees),
 					};
 
@@ -206,9 +206,17 @@ $(function () {
 					$(this).find(".ordre").text(element);
 				})
 			}
-
 		}
-
-
 	})
+
+  //gestion de l'ajout de la création de la base de données
+  $("input[name='isCreateDataBase']").change(function(e){
+    if($(this).val() == 1){
+      $(".field_database_name").show('slow');
+      $("input[name='database_name']").attr("required","required");
+    }else{
+      $(".field_database_name").hide('slow');
+      $("input[name='database_name']").val('').removeAttr("required");
+    }
+  });
 })

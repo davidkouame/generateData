@@ -8,8 +8,6 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'index$', views.index, name='index'),
-    url(r'generate-table$', views.generateTable, name='generateTable'),
-    url(r'generate-database$', views.generateDatabase, name='generateDatabase'),
     url(r'generate$', views.generate, name='generate'),
     url('^admin/', include(admin.site.urls)),
 
